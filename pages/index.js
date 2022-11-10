@@ -1,10 +1,14 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useEffect, useState } from 'react'
+import axios from 'axios'
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import Container from 'react-bootstrap/Container'
 import Nav from 'react-bootstrap/Nav'
 import Navbar from 'react-bootstrap/Navbar'
 import Alert from 'react-bootstrap/Alert'
+import Card from 'react-bootstrap/Card'
+import Col from 'react-bootstrap/Col'
+import Row from 'react-bootstrap/Row'
 import Button from 'react-bootstrap/Button'
 
 import { WalletProvider, useWallet } from '@mysten/wallet-adapter-react'
@@ -34,7 +38,8 @@ export default function Home() {
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
               <Nav className="me-auto">
-                <Nav.Link href="/">Mint</Nav.Link>
+                <Nav.Link href="/">APEs</Nav.Link>
+                <Nav.Link href="/mint">Mint</Nav.Link>
               </Nav>
             </Navbar.Collapse>
             <Navbar.Collapse className="justify-content-end">
@@ -48,73 +53,54 @@ export default function Home() {
   )
 }
 
-function getRandom(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min
-}
-
 function Main() {
-  const APE_PACKAGE = '0x0414719f65bc22e400ad4f73fe63267481773b50'
-  const APE_REGISTER = '0xa1a4d54c309adca3eab4c5f3dbb27b9e4011ed33'
-  const APE_ISSUE_CAP = '0x141e63d70f89bf361aeca3562a893664fd12c395'
-  const GAS_BUDGET = 10000
+  const [APEs, setAPEs] = useState([])
 
-  const { connected, signAndExecuteTransaction } = useWallet()
-  const [err, setErr] = useState('')
-  const [success, setSuccess] = useState(false)
-  const [APE, setAPE] = useState()
-  const [isPending, setIsPending] = useState(false)
-
-  const APEs = [
-    {
-      id: '#3954',
-      url: 'https://img.seadn.io/files/a869b6f365fa14f6b039e6ea83415427.png?fit=max&w=1000',
-    },
-    {
-      id: '#2974',
-      url: 'https://img.seadn.io/files/ea93d1afdcdc26942fe8f3215fadfd60.png?fit=max&w=1000',
-    },
-    {
-      id: '#7404',
-      url: 'https://img.seadn.io/files/47ae9300181f827bae236bc00768dbbe.png?fit=max&w=1000',
-    },
-  ]
-
-  const handleMintAPE = () => {
-    const luckyNumber = getRandom(0, 2)
-    const APE = APEs[luckyNumber]
-    setAPE(luckyNumber)
-    setIsPending(true)
-    signAndExecuteTransaction({
-      kind: 'moveCall',
+  const fetchAPEMintEvents = async () => {
+    const { data } = await axios({
+      method: 'POST',
+      url: 'https://fullnode.devnet.sui.io:443',
       data: {
-        packageObjectId: APE_PACKAGE,
-        module: 'sui_ape',
-        function: 'mint',
-        typeArguments: [],
-        arguments: [APE_REGISTER, APE_ISSUE_CAP, APE.url, `The APE ${APE.id}`],
-        gasBudget: GAS_BUDGET,
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'sui_getEvents',
+        params: [
+          {
+            MoveEvent:
+              '0x7be3c79b79028665699ec68a60d1b6bb460315ab::sui_ape::ApeMint',
+          },
+          null,
+          null,
+          null,
+        ],
       },
     })
-      .then((resp) => {
-        if (resp.effects.status.status == 'success') {
-          setSuccess(true)
-        } else {
-          setErr(resp.effects.status.error)
-        }
+    if (data?.result?.data) {
+      const promises = data.result.data.map((event) => {
+        return new Promise(async (resolve) => {
+          const { data } = await axios({
+            method: 'POST',
+            url: 'https://fullnode.devnet.sui.io:443',
+            data: {
+              jsonrpc: '2.0',
+              id: 1,
+              method: 'sui_getObject',
+              params: [event.event.moveEvent.fields.id],
+            },
+          })
+          resolve(data.result.details)
+        })
       })
-      .catch((error) => {
-        setErr(error.message)
-      })
-      .finally(() => {
-        setIsPending(false)
-      })
+      const promisesResult = await Promise.all(promises)
+      setAPEs(promisesResult)
+    }
   }
 
-  const handleClearAll = () => {
-    setSuccess(false)
-    setAPE()
-  }
+  useEffect(() => {
+    fetchAPEMintEvents()
+  }, [])
 
+  const { connected } = useWallet()
   return (
     <>
       {connected ? (
@@ -125,44 +111,30 @@ function Main() {
               textAlign: 'center',
             }}
           >
-            <Alert variant="primary">
-              點擊「進行鑄造」按鈕隨機獲得一個 Sui APE
-            </Alert>
+            <Alert variant="primary">APEs</Alert>
           </h1>
-          {success ? (
-            <div className="d-grid gap-2">
-              <Alert variant="secondary">
-                <Alert.Heading>鑄造成功了嗎？</Alert.Heading>
-                <p>恭喜你鑄造了 {APEs[APE].id}</p>
-                <hr />
-                <div className="d-flex justify-content-end">
-                  <Button variant="outline-primary" onClick={handleClearAll}>
-                    再次體驗
-                  </Button>
-                </div>
-              </Alert>
-              <img src={APEs[APE].url} />
-            </div>
-          ) : isPending ? (
-            '鑄造中...'
-          ) : (
-            <div className="d-grid gap-2">
-              <Button variant="dark" onClick={handleMintAPE}>
-                進行鑄造
-              </Button>
-            </div>
-          )}
+          <Row xs={2} md={2} lg={4} className="g-8">
+            {APEs.map((ape) => {
+              return (
+                <Col key={ape.data.fields.id.id}>
+                  <Card style={{ borderRadius: 30 }}>
+                    <Card.Img variant="top" src={ape.data.fields.url} />
+                    <Card.Body>
+                      <Card.Title>Owner {ape.owner.AddressOwner}</Card.Title>
+                      <Card.Text>{ape.data.fields.description}</Card.Text>
+                      <Card.Text>
+                        LEVEL: {ape.data.fields.attribute.fields.level}
+                        <br />
+                        HP: {ape.data.fields.attribute.fields.hp}
+                      </Card.Text>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              )
+            })}
+          </Row>
         </Container>
-      ) : (
-        <>
-          <Container style={{ marginTop: 10 }}>
-            <Alert variant="info">
-              <Alert.Heading>請先點擊右上角連接 Sui 錢包</Alert.Heading>
-              <div>連接錢包後，立即體驗鑄造 Sui APE</div>
-            </Alert>
-          </Container>
-        </>
-      )}
+      ) : null}
     </>
   )
 }
