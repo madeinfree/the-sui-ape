@@ -66,7 +66,7 @@ function Main() {
         params: [
           {
             MoveEvent:
-              '0x7be3c79b79028665699ec68a60d1b6bb460315ab::sui_ape::ApeMint',
+              '0x7b983a09ab2ed1ffcfd6ae21cf8d0522ab66e202::sui_ape::ApeMint',
           },
           null,
           null,
