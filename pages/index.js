@@ -9,7 +9,6 @@ import Alert from 'react-bootstrap/Alert'
 import Card from 'react-bootstrap/Card'
 import Col from 'react-bootstrap/Col'
 import Row from 'react-bootstrap/Row'
-import Button from 'react-bootstrap/Button'
 
 import { WalletProvider, useWallet } from '@mysten/wallet-adapter-react'
 import { WalletStandardAdapterProvider } from '@mysten/wallet-adapter-all-wallets'
@@ -113,7 +112,7 @@ function Main() {
           >
             <Alert variant="primary">APEs</Alert>
           </h1>
-          <Row xs={2} md={2} lg={4} className="g-8">
+          <Row xs={2} md={2} lg={4} className="g-4 mb-3">
             {APEs.map((ape) => {
               return (
                 <Col key={ape.data.fields.id.id}>

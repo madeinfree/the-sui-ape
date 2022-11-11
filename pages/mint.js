@@ -54,9 +54,9 @@ function getRandom(min, max) {
 }
 
 function Main() {
-  const APE_PACKAGE = '0x7be3c79b79028665699ec68a60d1b6bb460315ab'
-  const APE_REGISTER = '0xb69835583a577183ed93deae512bd029b70e6889'
-  const APE_ISSUE_CAP = '0xca36becd54a88a94229c0f5ceb41f3ce13bc013b'
+  const APE_PACKAGE = '0x7b983a09ab2ed1ffcfd6ae21cf8d0522ab66e202'
+  const APE_REGISTER = '0x370990dc46f48f146d794868c118e9b3f061ee8e'
+  const APE_ISSUE_CAP = '0xbcf1b6e503fb245f2886066392f800bbba74fa9f'
   const GAS_BUDGET = 10000
 
   const { connected, signAndExecuteTransaction } = useWallet()
