@@ -149,5 +149,14 @@ function Main() {
         <Alert variant="primary">天空競技場</Alert>
       </h1>
     </Container>
-  ) : null
+  ) : (
+    <>
+      <Container style={{ marginTop: 10 }}>
+        <Alert variant="info">
+          <Alert.Heading>請先點擊右上角連接 Sui 錢包</Alert.Heading>
+          <div>連接錢包後，立即體驗鑄造 Sui APE</div>
+        </Alert>
+      </Container>
+    </>
+  )
 }
