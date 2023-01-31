@@ -105,59 +105,7 @@ function Main() {
   const { connected } = useWallet()
   return (
     <>
-      {connected ? (
-        <Container>
-          <h1
-            style={{
-              marginTop: 10,
-              textAlign: 'center',
-            }}
-          >
-            <Alert variant="primary">APEs</Alert>
-          </h1>
-          <Row xs={2} md={2} lg={4} className="g-4 mb-3">
-            {APEs.map((ape) => {
-              return (
-                <Col key={ape.data.fields.id.id}>
-                  <Card style={{ borderRadius: 30 }}>
-                    <Card.Img variant="top" src={ape.data.fields.url} />
-                    <Card.Body>
-                      <Card.Title>
-                        <a
-                          target="_blank"
-                          style={{ textDecoration: 'none' }}
-                          href={`https://explorer.devnet.sui.io/objects/${ape.data.fields.id.id}`}
-                        >
-                          {ape.data.fields.name} #{ape.data.fields.n}
-                        </a>
-                      </Card.Title>
-                      <Card.Text>
-                        <Badge bg="dark">RANK: {ape.data.fields.rank}</Badge>
-                        <br />
-                        <Badge bg="primary">
-                          HP: {ape.data.fields.attribute.fields.hp}
-                        </Badge>
-                        <br />
-                        <Badge bg="primary">
-                          ATK: {ape.data.fields.attribute.fields.atk}
-                        </Badge>
-                        <br />
-                        <Badge bg="primary">
-                          DEF {ape.data.fields.attribute.fields.def}
-                        </Badge>
-                        <br />
-                        <Badge bg="primary">
-                          HIT: {ape.data.fields.attribute.fields.hit}
-                        </Badge>
-                      </Card.Text>
-                    </Card.Body>
-                  </Card>
-                </Col>
-              )
-            })}
-          </Row>
-        </Container>
-      ) : (
+      {connected ? null : (
         <>
           <Container style={{ marginTop: 10 }}>
             <Alert variant="info">
@@ -175,6 +123,57 @@ function Main() {
           </Container>
         </>
       )}
+      <Container>
+        <h1
+          style={{
+            marginTop: 10,
+            textAlign: 'center',
+          }}
+        >
+          <Alert variant="primary">APEs Ground</Alert>
+        </h1>
+        <Row xs={2} md={2} lg={4} className="g-4 mb-3">
+          {APEs.map((ape) => {
+            return (
+              <Col key={ape.data.fields.id.id}>
+                <Card style={{ borderRadius: 30 }}>
+                  <Card.Img variant="top" src={ape.data.fields.url} />
+                  <Card.Body>
+                    <Card.Title>
+                      <a
+                        target="_blank"
+                        style={{ textDecoration: 'none' }}
+                        href={`https://explorer.devnet.sui.io/objects/${ape.data.fields.id.id}`}
+                      >
+                        {ape.data.fields.name} #{ape.data.fields.n}
+                      </a>
+                    </Card.Title>
+                    <Card.Text>
+                      <Badge bg="dark">RANK: {ape.data.fields.rank}</Badge>
+                      <br />
+                      <Badge bg="primary">
+                        HP: {ape.data.fields.attribute.fields.hp}
+                      </Badge>
+                      <br />
+                      <Badge bg="primary">
+                        ATK: {ape.data.fields.attribute.fields.atk}
+                      </Badge>
+                      <br />
+                      <Badge bg="primary">
+                        DEF {ape.data.fields.attribute.fields.def}
+                      </Badge>
+                      <br />
+                      <Badge bg="primary">
+                        HIT: {ape.data.fields.attribute.fields.hit}
+                      </Badge>
+                    </Card.Text>
+                  </Card.Body>
+                </Card>
+              </Col>
+            )
+          })}
+        </Row>
+      </Container>
     </>
   )
 }
