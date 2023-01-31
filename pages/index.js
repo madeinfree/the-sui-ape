@@ -143,7 +143,7 @@ function Main() {
                       <a
                         target="_blank"
                         style={{ textDecoration: 'none' }}
-                        href={`https://explorer.devnet.sui.io/objects/${ape.data.fields.id.id}`}
+                        href={`https://explorer.sui.io/objects/${ape.data.fields.id.id}?network=devnet`}
                       >
                         {ape.data.fields.name} #{ape.data.fields.n}
                       </a>
