@@ -362,7 +362,15 @@ function Main() {
         <>
           <Container style={{ marginTop: 10 }}>
             <Alert variant="info">
-              <Alert.Heading>請先點擊右上角連接 Sui 錢包</Alert.Heading>
+              <Alert.Heading>
+                請先點擊右上角連接 Sui 錢包或
+                <a
+                  target="_blank"
+                  href="https://chrome.google.com/webstore/detail/sui-wallet/opcgpfmipidbgpenhmajoajpbobppdil"
+                >
+                  進行安裝
+                </a>
+              </Alert.Heading>
               <div>連接錢包後，立即體驗鑄造 Sui APE</div>
             </Alert>
           </Container>
