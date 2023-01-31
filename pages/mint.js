@@ -16,7 +16,7 @@ const MintDynamic = dynamic(() => import('../components/ConnectButton'), {
   ssr: false,
 })
 
-export default function Home() {
+export default function Mint() {
   const walletAdapters = useMemo(
     () => [new WalletStandardAdapterProvider()],
     []
@@ -38,6 +38,7 @@ export default function Home() {
               <Nav className="me-auto">
                 <Nav.Link href="/">APEs</Nav.Link>
                 <Nav.Link href="/mint">Mint</Nav.Link>
+                <Nav.Link href="/ape">My APE</Nav.Link>
               </Nav>
             </Navbar.Collapse>
             <Navbar.Collapse className="justify-content-end">
@@ -52,10 +53,8 @@ export default function Home() {
 }
 
 function Main() {
-  const APE_PACKAGE = '0x541317a916324727472643d92875ed66d0fa4996'
-  const APE_REGISTER = '0x392d3b30b920aade7815510a2bbf7ba4a31646d4'
-  const APE_ISSUE_CAP = '0x84528cdcaead5caf083a9974a38f120c7bfc8b7b'
-  const APE_ZOO = '0x5381ba47187266f77097692812abed44dc36456f'
+  const APE_PACKAGE = '0x1709f2f79e8f6545c7d8f209491cb5af7738ea91'
+  const APE_ZOO = '0x5c92d47e17d3b516c8d468dd55b2f3abbd4170a9'
   const GAS_BUDGET = 10000
 
   const { connected, signAndExecuteTransaction } = useWallet()
@@ -78,7 +77,7 @@ function Main() {
         module: 'sui_ape',
         function: 'mint',
         typeArguments: [],
-        arguments: [APE_REGISTER, APE_ISSUE_CAP, APE_ZOO, name],
+        arguments: [APE_ZOO, name],
         gasBudget: GAS_BUDGET,
       },
     })

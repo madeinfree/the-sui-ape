@@ -40,6 +40,7 @@ export default function Home() {
               <Nav className="me-auto">
                 <Nav.Link href="/">APEs</Nav.Link>
                 <Nav.Link href="/mint">Mint</Nav.Link>
+                <Nav.Link href="/ape">My APE</Nav.Link>
               </Nav>
             </Navbar.Collapse>
             <Navbar.Collapse className="justify-content-end">
@@ -67,7 +68,7 @@ function Main() {
         params: [
           {
             MoveEvent:
-              '0x541317a916324727472643d92875ed66d0fa4996::sui_ape::ApeMint',
+              '0x1709f2f79e8f6545c7d8f209491cb5af7738ea91::sui_ape::ApeMint',
           },
           null,
           null,
@@ -130,9 +131,7 @@ function Main() {
                         </a>
                       </Card.Title>
                       <Card.Text>
-                        <Badge bg="dark">
-                          LEVEL: {ape.data.fields.attribute.fields.level}
-                        </Badge>
+                        <Badge bg="dark">RANK: {ape.data.fields.rank}</Badge>
                         <br />
                         <Badge bg="primary">
                           HP: {ape.data.fields.attribute.fields.hp}
