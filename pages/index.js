@@ -41,6 +41,7 @@ export default function Home() {
                 <Nav.Link href="/">APEs</Nav.Link>
                 <Nav.Link href="/mint">Mint</Nav.Link>
                 <Nav.Link href="/ape">My APE</Nav.Link>
+                <Nav.Link href="/arena">Arena</Nav.Link>
               </Nav>
             </Navbar.Collapse>
             <Navbar.Collapse className="justify-content-end">

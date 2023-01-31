@@ -43,6 +43,7 @@ export default function Ape() {
                 <Nav.Link href="/">APEs</Nav.Link>
                 <Nav.Link href="/mint">Mint</Nav.Link>
                 <Nav.Link href="/ape">My APE</Nav.Link>
+                <Nav.Link href="/arena">Arena</Nav.Link>
               </Nav>
             </Navbar.Collapse>
             <Navbar.Collapse className="justify-content-end">
@@ -62,7 +63,7 @@ function Main() {
   const GAS_BUDGET = 10000
 
   const [APEs, setAPEs] = useState([])
-  const [APEsFight, setAPEsFight] = useState([])
+  const [ArenaAPEs, setArenaAPEs] = useState([])
   const { connected, wallet, signAndExecuteTransaction } = useWallet()
   const handleFetchApe = async () => {
     const addresses = await wallet?.getAccounts()
@@ -98,6 +99,7 @@ function Main() {
       })
     })
     const promisesResult = await Promise.all(promises)
+
     setAPEs(promisesResult)
   }
 
@@ -131,7 +133,26 @@ function Main() {
     })
     const promisesResult = await Promise.all(promises)
 
-    const promisesCheckOwner = promisesResult.map((object) => {
+    const promisesCheckOwner = promisesResult
+      .filter((ape) => ape.details.data.fields.owner === addresses[0])
+      .map((object) => {
+        return new Promise(async (resolve) => {
+          const { data } = await axios({
+            method: 'POST',
+            url: 'https://fullnode.devnet.sui.io:443',
+            data: {
+              jsonrpc: '2.0',
+              id: 1,
+              method: 'sui_getObjectsOwnedByObject',
+              params: [object.details.data.fields.id.id],
+            },
+          })
+          resolve(data.result[0])
+        })
+      })
+    const promisesCheckOwnerResult = await Promise.all(promisesCheckOwner)
+
+    const selfFightApes = promisesCheckOwnerResult.map((object) => {
       return new Promise(async (resolve) => {
         const { data } = await axios({
           method: 'POST',
@@ -140,39 +161,70 @@ function Main() {
             jsonrpc: '2.0',
             id: 1,
             method: 'sui_getObject',
-            params: [object.details.data.fields.value],
+            params: [object.objectId],
           },
         })
-        resolve(data.result?.details)
+        resolve(data.result.details)
       })
     })
-    const promisesCheckOwnerResult = await Promise.all(promisesCheckOwner)
 
-    setAPEsFight(
-      promisesCheckOwnerResult.filter(
-        (ape) => ape.data.fields.owner === addresses[0]
-      )
-    )
+    setArenaAPEs(await Promise.all(selfFightApes))
   }
 
   const handleRequestFight = async (apeId) => {
-    const resp = await signAndExecuteTransaction({
+    await signAndExecuteTransaction({
       kind: 'moveCall',
       data: {
         packageObjectId: APE_PACKAGE,
         module: 'sui_ape',
         function: 'request_fight',
+        typeArguments: [],
         arguments: [apeId, Playground],
         gasBudget: GAS_BUDGET,
       },
     })
-    console.log(resp)
+  }
+
+  const handleCancelRequestFight = async (apeId) => {
+    const { data } = await axios({
+      method: 'POST',
+      url: 'https://fullnode.devnet.sui.io:443',
+      data: {
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'sui_getObject',
+        params: [apeId],
+      },
+    })
+
+    const { data: data2 } = await axios({
+      method: 'POST',
+      url: 'https://fullnode.devnet.sui.io:443',
+      data: {
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'sui_getObject',
+        params: [data.result.details.owner.ObjectOwner],
+      },
+    })
+
+    await signAndExecuteTransaction({
+      kind: 'moveCall',
+      data: {
+        packageObjectId: APE_PACKAGE,
+        module: 'sui_ape',
+        function: 'cancel_request_fight',
+        typeArguments: [],
+        arguments: [data2.result.details.owner.ObjectOwner, Playground],
+        gasBudget: GAS_BUDGET,
+      },
+    })
   }
 
   useEffect(() => {
     if (!wallet) return
     handleFetchApe()
-    // handleFetchApeFightFromPlayground()
+    handleFetchApeFightFromPlayground()
   }, [connected])
 
   return (
@@ -190,6 +242,8 @@ function Main() {
           <Row xs={2} md={2} lg={4} className="g-4 mb-3">
             {APEs.map((ape) => {
               const canFight = ape.data.fields.status === 0
+              const fighting = ape.data.fields.status === 1
+              const rest = ape.data.fields.status === 2
               return (
                 <Col key={ape.data.fields.id.id}>
                   <Card style={{ borderRadius: 30 }}>
@@ -199,7 +253,7 @@ function Main() {
                         <a
                           target="_blank"
                           style={{ textDecoration: 'none' }}
-                          href={`https://explorer.devnet.sui.io/objects/${ape.data.fields.id.id}`}
+                          href={`https://explorer.sui.io/objects/${ape.data.fields.id.id}?network=devnet`}
                         >
                           {ape.data.fields.name} #{ape.data.fields.n}
                         </a>
@@ -235,7 +289,66 @@ function Main() {
                               : () => {}
                           }
                         >
-                          {canFight ? '發起戰鬥' : '進行療傷'}
+                          {fighting
+                            ? '離開競技場'
+                            : canFight
+                            ? '請求戰鬥'
+                            : rest
+                            ? '進行療傷'
+                            : '陣亡'}
+                        </Button>
+                      </Stack>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              )
+            })}
+          </Row>
+          <h2>戰鬥中</h2>
+          <Row xs={2} md={2} lg={4} className="g-4 mb-3">
+            {ArenaAPEs.map((ape) => {
+              return (
+                <Col key={ape.data.fields.id.id}>
+                  <Card style={{ borderRadius: 30 }}>
+                    <Card.Img variant="top" src={ape.data.fields.url} />
+                    <Card.Body>
+                      <Card.Title>
+                        <a
+                          target="_blank"
+                          style={{ textDecoration: 'none' }}
+                          href={`https://explorer.sui.io/objects/${ape.data.fields.id.id}?network=devnet`}
+                        >
+                          {ape.data.fields.name} #{ape.data.fields.n}
+                        </a>
+                      </Card.Title>
+                      <Card.Text>
+                        <Badge bg="dark">RANK: {ape.data.fields.rank}</Badge>
+                        <br />
+                        <Badge bg="primary">
+                          HP: {ape.data.fields.attribute.fields.hp}
+                        </Badge>
+                        <br />
+                        <Badge bg="primary">
+                          ATK: {ape.data.fields.attribute.fields.atk}
+                        </Badge>
+                        <br />
+                        <Badge bg="primary">
+                          DEF {ape.data.fields.attribute.fields.def}
+                        </Badge>
+                        <br />
+                        <Badge bg="primary">
+                          HIT: {ape.data.fields.attribute.fields.hit}
+                        </Badge>
+                      </Card.Text>
+                      <Stack>
+                        <Button
+                          variant={'outline-danger'}
+                          size="sm"
+                          onClick={() =>
+                            handleCancelRequestFight(ape.data.fields.id.id)
+                          }
+                        >
+                          離開競技場
                         </Button>
                       </Stack>
                     </Card.Body>
