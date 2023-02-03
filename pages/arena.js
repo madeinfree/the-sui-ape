@@ -55,8 +55,8 @@ export default function Arena() {
 }
 
 function Main() {
-  const APE_PACKAGE = '0x1709f2f79e8f6545c7d8f209491cb5af7738ea91'
-  const Playground = '0xc3ba1bd4c08fbdd0b7c838dc0cdaba42473633d8'
+  const APE_PACKAGE = '0xabf0d4e90e89c9166f81c34f3c1427a11d61964d'
+  const Playground = '0xc33ae00c2edb0e4f65e9b710f7abf51756fd3644'
   const GAS_BUDGET = 10000
 
   const { connected, signAndExecuteTransaction } = useWallet()
@@ -68,7 +68,7 @@ function Main() {
   const handleFindApeFromArena = async () => {
     const { data } = await axios({
       method: 'POST',
-      url: 'https://fullnode.devnet.sui.io:443',
+      url: 'https://fullnode.testnet.sui.io:443',
       data: {
         jsonrpc: '2.0',
         id: 1,
@@ -81,7 +81,7 @@ function Main() {
       return new Promise(async (resolve) => {
         const { data } = await axios({
           method: 'POST',
-          url: 'https://fullnode.devnet.sui.io:443',
+          url: 'https://fullnode.testnet.sui.io:443',
           data: {
             jsonrpc: '2.0',
             id: 1,
@@ -100,7 +100,7 @@ function Main() {
         return new Promise(async (resolve) => {
           const { data } = await axios({
             method: 'POST',
-            url: 'https://fullnode.devnet.sui.io:443',
+            url: 'https://fullnode.testnet.sui.io:443',
             data: {
               jsonrpc: '2.0',
               id: 1,
@@ -118,7 +118,7 @@ function Main() {
       return new Promise(async (resolve) => {
         const { data } = await axios({
           method: 'POST',
-          url: 'https://fullnode.devnet.sui.io:443',
+          url: 'https://fullnode.testnet.sui.io:443',
           data: {
             jsonrpc: '2.0',
             id: 1,

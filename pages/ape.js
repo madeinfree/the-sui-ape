@@ -58,8 +58,8 @@ export default function Ape() {
 }
 
 function Main() {
-  const APE_PACKAGE = '0x1709f2f79e8f6545c7d8f209491cb5af7738ea91'
-  const Playground = '0xc3ba1bd4c08fbdd0b7c838dc0cdaba42473633d8'
+  const APE_PACKAGE = '0xabf0d4e90e89c9166f81c34f3c1427a11d61964d'
+  const Playground = '0xc33ae00c2edb0e4f65e9b710f7abf51756fd3644'
   const GAS_BUDGET = 10000
 
   const [APEs, setAPEs] = useState([])
@@ -69,7 +69,7 @@ function Main() {
     const addresses = await wallet?.getAccounts()
     const apes = await axios({
       method: 'POST',
-      url: 'https://fullnode.devnet.sui.io:443',
+      url: 'https://fullnode.testnet.sui.io:443',
       data: {
         jsonrpc: '2.0',
         id: 1,
@@ -80,14 +80,14 @@ function Main() {
       result.filter(
         (object) =>
           object.type ===
-          '0x1709f2f79e8f6545c7d8f209491cb5af7738ea91::sui_ape::Ape'
+          '0xabf0d4e90e89c9166f81c34f3c1427a11d61964d::sui_ape::Ape'
       )
     )
     const promises = apes.map((ape) => {
       return new Promise(async (resolve) => {
         const { data } = await axios({
           method: 'POST',
-          url: 'https://fullnode.devnet.sui.io:443',
+          url: 'https://fullnode.testnet.sui.io:443',
           data: {
             jsonrpc: '2.0',
             id: 1,
@@ -107,7 +107,7 @@ function Main() {
     const addresses = await wallet?.getAccounts()
     const { data } = await axios({
       method: 'POST',
-      url: 'https://fullnode.devnet.sui.io:443',
+      url: 'https://fullnode.testnet.sui.io:443',
       data: {
         jsonrpc: '2.0',
         id: 1,
@@ -120,7 +120,7 @@ function Main() {
       return new Promise(async (resolve) => {
         const { data } = await axios({
           method: 'POST',
-          url: 'https://fullnode.devnet.sui.io:443',
+          url: 'https://fullnode.testnet.sui.io:443',
           data: {
             jsonrpc: '2.0',
             id: 1,
@@ -139,7 +139,7 @@ function Main() {
         return new Promise(async (resolve) => {
           const { data } = await axios({
             method: 'POST',
-            url: 'https://fullnode.devnet.sui.io:443',
+            url: 'https://fullnode.testnet.sui.io:443',
             data: {
               jsonrpc: '2.0',
               id: 1,
@@ -156,7 +156,7 @@ function Main() {
       return new Promise(async (resolve) => {
         const { data } = await axios({
           method: 'POST',
-          url: 'https://fullnode.devnet.sui.io:443',
+          url: 'https://fullnode.testnet.sui.io:443',
           data: {
             jsonrpc: '2.0',
             id: 1,
@@ -188,7 +188,7 @@ function Main() {
   const handleCancelRequestFight = async (apeId) => {
     const { data } = await axios({
       method: 'POST',
-      url: 'https://fullnode.devnet.sui.io:443',
+      url: 'https://fullnode.testnet.sui.io:443',
       data: {
         jsonrpc: '2.0',
         id: 1,
@@ -199,7 +199,7 @@ function Main() {
 
     const { data: data2 } = await axios({
       method: 'POST',
-      url: 'https://fullnode.devnet.sui.io:443',
+      url: 'https://fullnode.testnet.sui.io:443',
       data: {
         jsonrpc: '2.0',
         id: 1,
@@ -316,7 +316,7 @@ function Main() {
                         <a
                           target="_blank"
                           style={{ textDecoration: 'none' }}
-                          href={`https://explorer.sui.io/objects/${ape.data.fields.id.id}?network=devnet`}
+                          href={`https://explorer.sui.io/objects/${ape.data.fields.id.id}?network=testnet`}
                         >
                           {ape.data.fields.name} #{ape.data.fields.n}
                         </a>

@@ -54,8 +54,8 @@ export default function Mint() {
 }
 
 function Main() {
-  const APE_PACKAGE = '0x1709f2f79e8f6545c7d8f209491cb5af7738ea91'
-  const APE_ZOO = '0x5c92d47e17d3b516c8d468dd55b2f3abbd4170a9'
+  const APE_PACKAGE = '0xabf0d4e90e89c9166f81c34f3c1427a11d61964d'
+  const APE_ZOO = '0xc33ae00c2edb0e4f65e9b710f7abf51756fd3644'
   const GAS_BUDGET = 10000
 
   const { connected, signAndExecuteTransaction } = useWallet()
@@ -129,7 +129,7 @@ function Main() {
                   角色資訊 <br />
                   <a
                     target="_blank"
-                    href={`https://explorer.devnet.sui.io/objects/${APE.id}`}
+                    href={`https://explorer.sui.io/objects/${APE.id}?network=testnet`}
                   >
                     {APE.id}
                   </a>
