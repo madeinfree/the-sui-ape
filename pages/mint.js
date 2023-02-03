@@ -55,7 +55,7 @@ export default function Mint() {
 
 function Main() {
   const APE_PACKAGE = '0xabf0d4e90e89c9166f81c34f3c1427a11d61964d'
-  const APE_ZOO = '0xc33ae00c2edb0e4f65e9b710f7abf51756fd3644'
+  const APE_ZOO = '0xc2bddfea191d1738c267555117b97268d968dabd'
   const GAS_BUDGET = 10000
 
   const { connected, signAndExecuteTransaction } = useWallet()
