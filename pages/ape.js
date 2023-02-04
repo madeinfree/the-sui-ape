@@ -61,11 +61,7 @@ function Main() {
         params: [addresses[0]],
       },
     }).then(({ data: { result } }) =>
-      result.filter(
-        (object) =>
-          object.type ===
-          '0xabf0d4e90e89c9166f81c34f3c1427a11d61964d::sui_ape::Ape'
-      )
+      result.filter((object) => object.type === `${APE_PACKAGE}::sui_ape::Ape`)
     )
     const promises = apes.map((ape) => {
       return new Promise(async (resolve) => {
