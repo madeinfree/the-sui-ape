@@ -1,10 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
-import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import Container from 'react-bootstrap/Container'
-import Nav from 'react-bootstrap/Nav'
-import Navbar from 'react-bootstrap/Navbar'
 import Alert from 'react-bootstrap/Alert'
 import Card from 'react-bootstrap/Card'
 import Col from 'react-bootstrap/Col'
@@ -12,13 +9,13 @@ import Row from 'react-bootstrap/Row'
 import Badge from 'react-bootstrap/Badge'
 import Button from 'react-bootstrap/Button'
 import Stack from 'react-bootstrap/Stack'
+import Toast from 'react-bootstrap/Toast'
+import ToastContainer from 'react-bootstrap/ToastContainer'
 
 import { WalletProvider, useWallet } from '@mysten/wallet-adapter-react'
 import { WalletStandardAdapterProvider } from '@mysten/wallet-adapter-all-wallets'
 
-const MintDynamic = dynamic(() => import('../components/ConnectButton'), {
-  ssr: false,
-})
+import Navbar from '../components/Navbar'
 
 export default function Ape() {
   const walletAdapters = useMemo(
@@ -34,23 +31,7 @@ export default function Ape() {
         <link rel="icon" href="https://sui.io/favicon.png" />
       </Head>
       <WalletProvider adapters={walletAdapters}>
-        <Navbar bg="light" expand="lg">
-          <Container>
-            <Navbar.Brand href="/">The Sui APE War</Navbar.Brand>
-            <Navbar.Toggle aria-controls="basic-navbar-nav" />
-            <Navbar.Collapse id="basic-navbar-nav">
-              <Nav className="me-auto">
-                <Nav.Link href="/">APEs</Nav.Link>
-                <Nav.Link href="/mint">Mint</Nav.Link>
-                <Nav.Link href="/ape">My APE</Nav.Link>
-                <Nav.Link href="/arena">Arena</Nav.Link>
-              </Nav>
-            </Navbar.Collapse>
-            <Navbar.Collapse className="justify-content-end">
-              <MintDynamic />
-            </Navbar.Collapse>
-          </Container>
-        </Navbar>
+        <Navbar />
         <Main />
       </WalletProvider>
     </>
@@ -58,9 +39,12 @@ export default function Ape() {
 }
 
 function Main() {
-  const APE_PACKAGE = '0xabf0d4e90e89c9166f81c34f3c1427a11d61964d'
-  const Playground = '0xc33ae00c2edb0e4f65e9b710f7abf51756fd3644'
+  const APE_PACKAGE = process.env.NEXT_PUBLIC_PACKAGE
+  const Playground = process.env.NEXT_PUBLIC_PLAYGROUND
   const GAS_BUDGET = 10000
+
+  const [showError, setShowError] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
 
   const [APEs, setAPEs] = useState([])
   const [ArenaAPEs, setArenaAPEs] = useState([])
@@ -172,53 +156,69 @@ function Main() {
   }
 
   const handleRequestFight = async (apeId) => {
-    await signAndExecuteTransaction({
-      kind: 'moveCall',
-      data: {
-        packageObjectId: APE_PACKAGE,
-        module: 'sui_ape',
-        function: 'request_fight',
-        typeArguments: [],
-        arguments: [apeId, Playground],
-        gasBudget: GAS_BUDGET,
-      },
-    })
+    try {
+      await signAndExecuteTransaction({
+        kind: 'moveCall',
+        data: {
+          packageObjectId: APE_PACKAGE,
+          module: 'sui_ape',
+          function: 'request_fight',
+          typeArguments: [],
+          arguments: [apeId, Playground],
+          gasBudget: GAS_BUDGET,
+        },
+      })
+
+      handleFetchApe()
+      handleFetchApeFightFromPlayground()
+    } catch (err) {
+      setErrorMessage(err.message)
+      setShowError(true)
+    }
   }
 
   const handleCancelRequestFight = async (apeId) => {
-    const { data } = await axios({
-      method: 'POST',
-      url: 'https://fullnode.testnet.sui.io:443',
-      data: {
-        jsonrpc: '2.0',
-        id: 1,
-        method: 'sui_getObject',
-        params: [apeId],
-      },
-    })
+    try {
+      const { data } = await axios({
+        method: 'POST',
+        url: 'https://fullnode.testnet.sui.io:443',
+        data: {
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'sui_getObject',
+          params: [apeId],
+        },
+      })
 
-    const { data: data2 } = await axios({
-      method: 'POST',
-      url: 'https://fullnode.testnet.sui.io:443',
-      data: {
-        jsonrpc: '2.0',
-        id: 1,
-        method: 'sui_getObject',
-        params: [data.result.details.owner.ObjectOwner],
-      },
-    })
+      const { data: data2 } = await axios({
+        method: 'POST',
+        url: 'https://fullnode.testnet.sui.io:443',
+        data: {
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'sui_getObject',
+          params: [data.result.details.owner.ObjectOwner],
+        },
+      })
 
-    await signAndExecuteTransaction({
-      kind: 'moveCall',
-      data: {
-        packageObjectId: APE_PACKAGE,
-        module: 'sui_ape',
-        function: 'cancel_request_fight',
-        typeArguments: [],
-        arguments: [data2.result.details.owner.ObjectOwner, Playground],
-        gasBudget: GAS_BUDGET,
-      },
-    })
+      await signAndExecuteTransaction({
+        kind: 'moveCall',
+        data: {
+          packageObjectId: APE_PACKAGE,
+          module: 'sui_ape',
+          function: 'cancel_request_fight',
+          typeArguments: [],
+          arguments: [data2.result.details.owner.ObjectOwner, Playground],
+          gasBudget: GAS_BUDGET,
+        },
+      })
+
+      handleFetchApe()
+      handleFetchApeFightFromPlayground()
+    } catch (err) {
+      setErrorMessage(err.message)
+      setShowError(true)
+    }
   }
 
   useEffect(() => {
@@ -229,6 +229,24 @@ function Main() {
 
   return (
     <>
+      <ToastContainer className="p-3" position="top-end">
+        <Toast
+          onClose={() => setShowError(false)}
+          show={showError}
+          delay={3000}
+          autohide
+        >
+          <Toast.Header closeButton={false}>
+            <img
+              src="holder.js/20x20?text=%20"
+              className="rounded me-2"
+              alt=""
+            />
+            <strong className="me-auto">發生錯誤</strong>
+          </Toast.Header>
+          <Toast.Body>{errorMessage}</Toast.Body>
+        </Toast>
+      </ToastContainer>
       {connected ? (
         <Container>
           <h1
@@ -239,6 +257,7 @@ function Main() {
           >
             <Alert variant="primary">擁有角色</Alert>
           </h1>
+          {APEs.length ? <h2>閒置中</h2> : null}
           <Row xs={2} md={2} lg={4} className="g-4 mb-3">
             {APEs.map((ape) => {
               const canFight = ape.data.fields.status === 0
@@ -290,9 +309,9 @@ function Main() {
                           }
                         >
                           {fighting
-                            ? '離開競技場'
+                            ? '離開天空競技場'
                             : canFight
-                            ? '請求戰鬥'
+                            ? '加入天空競技場'
                             : rest
                             ? '進行療傷'
                             : '陣亡'}
@@ -304,7 +323,7 @@ function Main() {
               )
             })}
           </Row>
-          <h2>戰鬥中</h2>
+          {ArenaAPEs.length ? <h2>戰鬥中</h2> : null}
           <Row xs={2} md={2} lg={4} className="g-4 mb-3">
             {ArenaAPEs.map((ape) => {
               return (

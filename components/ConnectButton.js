@@ -18,7 +18,7 @@ export default function Mint() {
         <Button onClick={handleDisconnectWallet}>Disconnect</Button>
       ) : (
         wallets
-          .filter((w) => w.name === 'Sui Wallet')
+          // .filter((w) => w.name === 'Sui Wallet')
           .map((wallet) => (
             <Button
               key={wallet.name}

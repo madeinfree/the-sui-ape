@@ -3,8 +3,6 @@ import axios from 'axios'
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import Container from 'react-bootstrap/Container'
-import Nav from 'react-bootstrap/Nav'
-import Navbar from 'react-bootstrap/Navbar'
 import Alert from 'react-bootstrap/Alert'
 import Button from 'react-bootstrap/Button'
 import Image from 'react-bootstrap/Image'
@@ -13,9 +11,7 @@ import Form from 'react-bootstrap/Form'
 import { WalletProvider, useWallet } from '@mysten/wallet-adapter-react'
 import { WalletStandardAdapterProvider } from '@mysten/wallet-adapter-all-wallets'
 
-const MintDynamic = dynamic(() => import('../components/ConnectButton'), {
-  ssr: false,
-})
+import Navbar from '../components/Navbar'
 
 export default function Arena() {
   const walletAdapters = useMemo(
@@ -31,23 +27,7 @@ export default function Arena() {
         <link rel="icon" href="https://sui.io/favicon.png" />
       </Head>
       <WalletProvider adapters={walletAdapters}>
-        <Navbar bg="light" expand="lg">
-          <Container>
-            <Navbar.Brand href="/">The Sui APE War</Navbar.Brand>
-            <Navbar.Toggle aria-controls="basic-navbar-nav" />
-            <Navbar.Collapse id="basic-navbar-nav">
-              <Nav className="me-auto">
-                <Nav.Link href="/">APEs</Nav.Link>
-                <Nav.Link href="/mint">Mint</Nav.Link>
-                <Nav.Link href="/ape">My APE</Nav.Link>
-                <Nav.Link href="/arena">Arena</Nav.Link>
-              </Nav>
-            </Navbar.Collapse>
-            <Navbar.Collapse className="justify-content-end">
-              <MintDynamic />
-            </Navbar.Collapse>
-          </Container>
-        </Navbar>
+        <Navbar />
         <Main />
       </WalletProvider>
     </>
@@ -55,8 +35,8 @@ export default function Arena() {
 }
 
 function Main() {
-  const APE_PACKAGE = '0xabf0d4e90e89c9166f81c34f3c1427a11d61964d'
-  const Playground = '0xc33ae00c2edb0e4f65e9b710f7abf51756fd3644'
+  const APE_PACKAGE = process.env.NEXT_PUBLIC_PACKAGE
+  const Playground = process.env.NEXT_PUBLIC_PLAYGROUND
   const GAS_BUDGET = 10000
 
   const { connected, signAndExecuteTransaction } = useWallet()

@@ -54,7 +54,9 @@ export default () => {
             <MintDynamic />
           ) : (
             <NavDropdown title="Setting" id="basic-nav-dropdown">
-              <NavDropdown.Item>{balance} FIGHT</NavDropdown.Item>
+              <NavDropdown.Item>
+                {(Number(balance) / 100).toLocaleString()} FIGHT
+              </NavDropdown.Item>
               <NavDropdown.Item>
                 <div onClick={disconnect}>Disconnect</div>
               </NavDropdown.Item>

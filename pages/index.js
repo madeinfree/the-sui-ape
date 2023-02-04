@@ -47,8 +47,7 @@ function Main() {
         method: 'sui_getEvents',
         params: [
           {
-            MoveEvent:
-              '0xabf0d4e90e89c9166f81c34f3c1427a11d61964d::sui_ape::ApeMint',
+            MoveEvent: `${process.env.NEXT_PUBLIC_PACKAGE}::sui_ape::ApeMint`,
           },
           null,
           null,
