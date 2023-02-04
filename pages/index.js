@@ -1,10 +1,7 @@
 import { useMemo, useEffect, useState } from 'react'
 import axios from 'axios'
-import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import Container from 'react-bootstrap/Container'
-import Nav from 'react-bootstrap/Nav'
-import Navbar from 'react-bootstrap/Navbar'
 import Alert from 'react-bootstrap/Alert'
 import Card from 'react-bootstrap/Card'
 import Col from 'react-bootstrap/Col'
@@ -14,9 +11,7 @@ import Badge from 'react-bootstrap/Badge'
 import { WalletProvider, useWallet } from '@mysten/wallet-adapter-react'
 import { WalletStandardAdapterProvider } from '@mysten/wallet-adapter-all-wallets'
 
-const MintDynamic = dynamic(() => import('../components/ConnectButton'), {
-  ssr: false,
-})
+import Navbar from '../components/Navbar'
 
 export default function Home() {
   const walletAdapters = useMemo(
@@ -32,23 +27,7 @@ export default function Home() {
         <link rel="icon" href="https://sui.io/favicon.png" />
       </Head>
       <WalletProvider adapters={walletAdapters}>
-        <Navbar bg="light" expand="lg">
-          <Container>
-            <Navbar.Brand href="/">The Sui APE War</Navbar.Brand>
-            <Navbar.Toggle aria-controls="basic-navbar-nav" />
-            <Navbar.Collapse id="basic-navbar-nav">
-              <Nav className="me-auto">
-                <Nav.Link href="/">APEs</Nav.Link>
-                <Nav.Link href="/mint">Mint</Nav.Link>
-                <Nav.Link href="/ape">My APE</Nav.Link>
-                <Nav.Link href="/arena">Arena</Nav.Link>
-              </Nav>
-            </Navbar.Collapse>
-            <Navbar.Collapse className="justify-content-end">
-              <MintDynamic />
-            </Navbar.Collapse>
-          </Container>
-        </Navbar>
+        <Navbar />
         <Main />
       </WalletProvider>
     </>
