@@ -27,7 +27,7 @@ export default () => {
           method: 'sui_getBalance',
           params: [
             wallet.wallet.accounts[0].address,
-            '0x616b40ddde153df8bdb79045038c1aeb2188f058::fightcoin::FIGHTCOIN',
+            `${process.env.NEXT_PUBLIC_FIGHT_COIN}::fightcoin::FIGHTCOIN`,
           ],
         },
       }).then((res) => {

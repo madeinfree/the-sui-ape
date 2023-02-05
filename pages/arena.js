@@ -116,6 +116,7 @@ function Main() {
               },
             })
             data.result.details.listing = field.listing
+            data.result.details.status = field.status
             resolve(data.result.details)
           })
         })
@@ -139,7 +140,7 @@ function Main() {
           typeArguments: [`${FIGHT_COIN}::fightcoin::FIGHTCOIN`],
           arguments: [
             Playground,
-            '0xbfd2a88dc6181137869a51b3f265e32fcd0415d4',
+            '0xeaa6bce7529eb501f24295d5c9befe93dd0196ae',
             opponent,
             REWARD_POOL,
           ],
@@ -184,7 +185,7 @@ function Main() {
           </h1>
           <Row xs={2} md={2} lg={4} className="g-4 mb-3">
             {ArenaApes.map((ape) => {
-              const canFight = ape.stauts === 1
+              const canFight = ape.status === 1
               return (
                 <Col key={ape.data.fields.id.id}>
                   <Card style={{ borderRadius: 30 }}>
